@@ -7,35 +7,70 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Light theme ── */
+/* ── Shared ── */
 :root{
-  --bg:#f0f0ed;
-  --surface:#ffffff;
-  --s2:#f5f5f2;
-  --s3:#ebebea;
-  --b1:rgba(0,0,0,.08);
-  --b2:rgba(0,0,0,.14);
-  --b3:rgba(0,0,0,.28);
-  --text:#18181a;
-  --muted:#60606a;
-  --muted2:#9898a4;
-  --accent:#5a50e0;
-  --accent2:#9b4ec9;
-  --accent3:#2272d8;
-  --red:#d93636;
-  --green:#1c9e5e;
-  --amber:#c97a10;
-  --teal:#0e8a7a;
-  --mono:'Space Mono',monospace;
-  --sans:'DM Sans',sans-serif;
+  --mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
   --r:14px;--r2:10px;
 }
+/* Light */
+body.light,:root{
+  --bg:#f0f0ed;--surface:#ffffff;--s2:#f5f5f2;--s3:#e8e8e5;
+  --b1:rgba(0,0,0,.08);--b2:rgba(0,0,0,.14);--b3:rgba(0,0,0,.30);
+  --text:#18181a;--muted:#60606a;--muted2:#9898a4;
+  --accent:#5a50e0;--accent2:#9b4ec9;--accent3:#2272d8;
+  --red:#d93636;--green:#1c9e5e;--amber:#c97a10;--teal:#0e8a7a;
+  --canvas-bg:#f8f8f6;--brk-col:rgba(0,0,0,.35);
+  --shadow:0 1px 4px rgba(0,0,0,.06);
+}
+/* Dark */
+body.dark{
+  --bg:#0d0d0f;--surface:#141417;--s2:#1a1a1f;--s3:#212128;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);--b3:rgba(255,255,255,.26);
+  --text:#f0f0ef;--muted:#7a7a86;--muted2:#55555e;
+  --accent:#7c6ef5;--accent2:#c97bee;--accent3:#5b9cf0;
+  --red:#f05b5b;--green:#5bda9b;--amber:#f0b85b;--teal:#5bf0d8;
+  --canvas-bg:#080809;--brk-col:rgba(255,255,255,.40);
+  --shadow:0 1px 6px rgba(0,0,0,.40);
+}
+/* Smooth transitions (skip canvas) */
+body,body *:not(canvas){transition:background-color .35s,border-color .35s,color .35s,box-shadow .35s,opacity .35s;}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;font-size:15px}
-
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 900px 500px at 50% -80px,rgba(90,80,224,.05) 0%,transparent 70%)}
+
+/* ── Theme toggle button ── */
+.theme-toggle{
+  position:relative;width:58px;height:30px;border-radius:15px;
+  background:var(--s3);border:1.5px solid var(--b2);
+  cursor:pointer;outline:none;flex-shrink:0;padding:0;
+  overflow:hidden;
+}
+.theme-toggle:hover{border-color:var(--accent);}
+.tt-track{
+  position:absolute;inset:0;display:flex;align-items:center;
+  padding:0 5px;justify-content:space-between;pointer-events:none;
+}
+.tt-track .tt-sun{font-size:13px;line-height:1;transition:opacity .3s,transform .35s;}
+.tt-track .tt-moon{font-size:13px;line-height:1;transition:opacity .3s,transform .35s;}
+body.light .tt-track .tt-sun{opacity:1;transform:scale(1) rotate(0deg);}
+body.light .tt-track .tt-moon{opacity:.25;transform:scale(.7) rotate(30deg);}
+body.dark .tt-track .tt-sun{opacity:.25;transform:scale(.7) rotate(-30deg);}
+body.dark .tt-track .tt-moon{opacity:1;transform:scale(1) rotate(0deg);}
+/* sliding knob */
+.tt-knob{
+  position:absolute;top:3px;left:3px;
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 2px 6px rgba(0,0,0,.30);
+  transition:transform .42s cubic-bezier(.34,1.56,.64,1),background .35s;
+  pointer-events:none;
+}
+body.dark .tt-knob{transform:translateX(28px);}
+@keyframes tRipple{0%{box-shadow:0 2px 6px rgba(0,0,0,.3),0 0 0 0 rgba(124,110,245,.5)}100%{box-shadow:0 2px 6px rgba(0,0,0,.3),0 0 0 9px rgba(124,110,245,0)}}
+.theme-toggle:active .tt-knob{animation:tRipple .45s ease-out;}
 
 .wrap{position:relative;z-index:1;max-width:1420px;margin:0 auto;padding:0 22px 60px}
 
@@ -66,7 +101,7 @@ header{padding:22px 0 18px;display:flex;align-items:center;justify-content:space
 .gdot.o{background:#2272d8;box-shadow:0 0 5px #2272d860}
 .gdot.t{background:var(--accent);box-shadow:0 0 5px #5a50e060}
 .graph-meta{font-family:var(--mono);font-size:11px;color:var(--muted2)}
-.canvas-wrap{position:relative;width:100%;cursor:grab;touch-action:none;background:#f8f8f6}
+.canvas-wrap{position:relative;width:100%;cursor:grab;touch-action:none;background:var(--canvas-bg)}
 .canvas-wrap:active{cursor:grabbing}
 canvas{display:block;width:100%;height:100%}
 .zoom-hint{position:absolute;bottom:8px;right:10px;font-size:10px;
@@ -135,9 +170,16 @@ input.vinp:focus{border-color:var(--accent);background:#fff}
    and expressions.  The row-label brackets are drawn with inline SVG
    so they scale with the actual cell height automatically.
 ── */
-.mat-outer{display:flex;align-items:center;gap:0;margin-bottom:16px}
-.mat-brk-svg{flex-shrink:0;align-self:stretch}   /* SVG bracket, height=100% of grid */
-.mat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 4px}
+.mat-outer{display:flex;align-items:stretch;gap:0;margin-bottom:16px}
+/* CSS brackets — left and right borders with top/bottom caps */
+.mat-brk{
+  width:18px;flex-shrink:0;border:3.5px solid var(--brk-col);
+  border-radius:3px;
+  transition:border-color .35s;
+}
+.mat-brk.left{ border-right:none; border-radius:5px 0 0 5px; }
+.mat-brk.right{ border-left:none; border-radius:0 5px 5px 0; }
+.mat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 6px;flex:1;}
 
 /* The single input per cell */
 input.mcell{
@@ -156,12 +198,12 @@ input.mcell{
 }
 input.mcell:focus{
   border-color:var(--accent);
-  background:#fff;
+  background:var(--surface);
   box-shadow:0 0 0 3px rgba(90,80,224,.12);
 }
 input.mcell::placeholder{font-size:11px;color:var(--muted2);font-weight:400}
-input.mcell.expr-mode{color:var(--accent2);font-size:13px;background:#fdf8ff}
-input.mcell.err-mode{border-color:var(--red);color:var(--red);background:#fff8f8}
+input.mcell.expr-mode{color:var(--accent2);font-size:13px;background:var(--s2)}
+input.mcell.err-mode{border-color:var(--red);color:var(--red);background:var(--s2)}
 
 /* evaluated preview badge under expr cells */
 .mcell-preview{
@@ -263,6 +305,13 @@ input.mcell.err-mode{border-color:var(--red);color:var(--red);background:#fff8f8
   <div class="hdr-right">
     <span class="hdr-kbd">Ctrl+Enter = Transform</span>
     <span class="hdr-badge">2D · R²→R²</span>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle dark/light mode">
+      <div class="tt-track">
+        <span class="tt-sun">☀️</span>
+        <span class="tt-moon">🌙</span>
+      </div>
+      <div class="tt-knob"></div>
+    </button>
   </div>
 </header>
 
@@ -378,10 +427,9 @@ input.mcell.err-mode{border-color:var(--red);color:var(--red);background:#fff8f8
         <div class="fnc" onclick="ins('floor(')">floor</div>
       </div>
 
-      <!-- Matrix input with SVG brackets that match height -->
+      <!-- Matrix input — CSS brackets always match height -->
       <div class="mat-outer" id="mat-outer">
-        <!-- left bracket — drawn by JS after layout -->
-        <svg id="brk-l" class="mat-brk-svg" width="22" viewBox="0 0 22 120" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M18 6 L6 6 L6 114 L18 114"/></svg>
+        <div class="mat-brk left"></div>
         <div class="mat-grid" id="mat-grid">
           <div>
             <input class="mcell" id="c00" type="text" value="1" placeholder="1" oninput="onCell('c00')" onfocus="lfc='c00'" autocomplete="off" spellcheck="false">
@@ -400,8 +448,7 @@ input.mcell.err-mode{border-color:var(--red);color:var(--red);background:#fff8f8
             <div class="mcell-preview" id="p11"></div>
           </div>
         </div>
-        <!-- right bracket -->
-        <svg id="brk-r" class="mat-brk-svg" width="22" viewBox="0 0 22 120" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M4 6 L16 6 L16 114 L4 114"/></svg>
+        <div class="mat-brk right"></div>
         <div class="mat-row-lbls" id="mat-row-lbls">
           <span class="mat-rlbl">r₁</span>
           <span class="mat-rlbl">r₂</span>
@@ -576,28 +623,7 @@ function getMatrix(){
   return[getCellVal('c00',1),getCellVal('c01',0),getCellVal('c10',0),getCellVal('c11',1)];
 }
 
-// ── SVG brackets resize to match grid height ──────────────────────────
-function resizeBrackets(){
-  const grid=document.getElementById('mat-grid');
-  if(!grid)return;
-  const h=grid.offsetHeight;
-  ['brk-l','brk-r'].forEach(id=>{
-    const svg=document.getElementById(id);
-    if(svg){svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 22 ${h}`);}
-  });
-  // also space the row labels
-  const lbls=document.getElementById('mat-row-lbls');
-  if(lbls){
-    const cells=grid.querySelectorAll('.mcell');
-    if(cells.length>=3){
-      const r1h=cells[0].offsetHeight+(cells[0].closest('div').offsetHeight-cells[0].offsetHeight)/2;
-      lbls.style.gap=(cells[2].getBoundingClientRect().top - cells[0].getBoundingClientRect().top - cells[0].offsetHeight/2 - cells[2].offsetHeight/2)+'px';
-    }
-  }
-}
-// Run once after initial paint, and on resize
-window.addEventListener('load',()=>{ setTimeout(resizeBrackets,50); });
-window.addEventListener('resize', resizeBrackets);
+// brackets are CSS-only — no JS needed
 
 // ── Eigenvalue solver ─────────────────────────────────────────────────
 function computeEigen(m){
@@ -736,7 +762,12 @@ function drawScene(id,m){
   const W=canvas.clientWidth,H=canvas.clientHeight;
   ctx.clearRect(0,0,W,H);
   // Light canvas bg
-  ctx.fillStyle='#f8f8f6';ctx.fillRect(0,0,W,H);
+  // Read theme colors from CSS vars each frame
+  const cs=getComputedStyle(document.body);
+  const cBg=cs.getPropertyValue('--canvas-bg').trim()||'#f8f8f6';
+  const cGrid=cs.getPropertyValue('--grid-col')||'rgba(0,0,0,.07)';
+  const cZero=cs.getPropertyValue('--grid-zero')||'rgba(0,0,0,.15)';
+  ctx.fillStyle=cBg;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
   const sc=views[id].scale,dr=Math.ceil(Math.max(W,H)/sc)+4;
 
@@ -745,9 +776,9 @@ function drawScene(id,m){
     for(let i=-dr;i<=dr;i+=gridStep){
       const iz=i===0;
       ctx.beginPath();ctx.moveTo(wx(id,i,-dr,m),wy(id,i,-dr,m));ctx.lineTo(wx(id,i,dr,m),wy(id,i,dr,m));
-      ctx.strokeStyle=iz?'rgba(0,0,0,.15)':'rgba(0,0,0,.07)';ctx.lineWidth=iz?1:.5;ctx.stroke();
+      ctx.strokeStyle=iz?cZero:cGrid;ctx.lineWidth=iz?1:.5;ctx.stroke();
       ctx.beginPath();ctx.moveTo(wx(id,-dr,i,m),wy(id,-dr,i,m));ctx.lineTo(wx(id,dr,i,m),wy(id,dr,i,m));
-      ctx.strokeStyle=iz?'rgba(0,0,0,.15)':'rgba(0,0,0,.07)';ctx.lineWidth=iz?1:.5;ctx.stroke();
+      ctx.strokeStyle=iz?cZero:cGrid;ctx.lineWidth=iz?1:.5;ctx.stroke();
     }
   }
   // Unit circle
@@ -757,15 +788,20 @@ function drawScene(id,m){
     ctx.closePath();ctx.strokeStyle='rgba(90,80,224,.35)';ctx.lineWidth=1.3;ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
   }
   // Axes
+  const axCol=document.body.classList.contains('dark')?'rgba(91,156,240,.7)':'rgba(34,114,216,.7)';
+  const lblCol=document.body.classList.contains('dark')?'rgba(255,255,255,.32)':'rgba(0,0,0,.35)';
+  const lblAxCol=document.body.classList.contains('dark')?'rgba(91,156,240,.8)':'rgba(34,114,216,.8)';
+  const origCol=document.body.classList.contains('dark')?'rgba(255,255,255,.5)':'rgba(0,0,0,.5)';
+  const ucCol=document.body.classList.contains('dark')?'rgba(124,110,245,.35)':'rgba(90,80,224,.35)';
   if(showAxes){
     ctx.beginPath();ctx.moveTo(wx(id,-dr,0,m),wy(id,-dr,0,m));ctx.lineTo(wx(id,dr,0,m),wy(id,dr,0,m));
-    ctx.strokeStyle='rgba(34,114,216,.7)';ctx.lineWidth=1.6;ctx.stroke();
-    aHead(ctx,wx(id,dr-1,0,m),wy(id,dr-1,0,m),wx(id,dr,0,m),wy(id,dr,0,m),'rgba(34,114,216,.7)',8);
+    ctx.strokeStyle=axCol;ctx.lineWidth=1.6;ctx.stroke();
+    aHead(ctx,wx(id,dr-1,0,m),wy(id,dr-1,0,m),wx(id,dr,0,m),wy(id,dr,0,m),axCol,8);
     ctx.beginPath();ctx.moveTo(wx(id,0,-dr,m),wy(id,0,-dr,m));ctx.lineTo(wx(id,0,dr,m),wy(id,0,dr,m));
-    ctx.strokeStyle='rgba(34,114,216,.7)';ctx.lineWidth=1.6;ctx.stroke();
-    aHead(ctx,wx(id,0,dr-1,m),wy(id,0,dr-1,m),wx(id,0,dr,m),wy(id,0,dr,m),'rgba(34,114,216,.7)',8);
+    ctx.strokeStyle=axCol;ctx.lineWidth=1.6;ctx.stroke();
+    aHead(ctx,wx(id,0,dr-1,m),wy(id,0,dr-1,m),wx(id,0,dr,m),wy(id,0,dr,m),axCol,8);
     if(showLabels&&sc>=14){
-      ctx.font='11px "Space Mono",monospace';ctx.fillStyle='rgba(0,0,0,.35)';
+      ctx.font='11px "Space Mono",monospace';ctx.fillStyle=lblCol;
       for(let i=-dr;i<=dr;i+=gridStep){
         if(!i)continue;
         const px=wx(id,i,0,m),py=wy(id,i,0,m);
@@ -773,7 +809,7 @@ function drawScene(id,m){
         const qx=wx(id,0,i,m),qy=wy(id,0,i,m);
         if(qx>-20&&qx<W+20&&qy>-20&&qy<H+20){ctx.textAlign='right';ctx.fillText(i,qx-6,qy+4);}
       }
-      ctx.fillStyle='rgba(34,114,216,.8)';ctx.font='bold 12px "Space Mono",monospace';ctx.textAlign='left';
+      ctx.fillStyle=lblAxCol;ctx.font='bold 12px "Space Mono",monospace';ctx.textAlign='left';
       ctx.fillText('x',Math.min(wx(id,dr,0,m)+4,W-14),wy(id,dr,0,m)+5);
       ctx.fillText('y',wx(id,0,dr,m)+5,Math.max(wy(id,0,dr,m),14));
     }
@@ -810,7 +846,7 @@ function drawScene(id,m){
     if(showLabels){ctx.save();ctx.font='11px "Space Mono",monospace';ctx.fillStyle=v.color;ctx.fillText(`(${(+v.x).toFixed(1)},${(+v.y).toFixed(1)})`,ox+tv[0]*sc+8,oy-tv[1]*sc-6);ctx.restore();}
   });
   // Origin
-  ctx.beginPath();ctx.arc(views[id].ox,views[id].oy,3.5,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.5)';ctx.fill();
+  ctx.beginPath();ctx.arc(views[id].ox,views[id].oy,3.5,0,Math.PI*2);ctx.fillStyle=origCol;ctx.fill();
   ctx.restore();
 }
 
@@ -866,7 +902,7 @@ function sp(a,b,c,d,name){
   ids.forEach((id,i)=>{document.getElementById(id).value=vals[i];onCell(id);});
   document.getElementById('status').textContent=`Preset: ${name}`;
   document.getElementById('status').className='status';
-  setTimeout(resizeBrackets,20);
+  
 }
 
 function resetAll(){
@@ -885,7 +921,7 @@ function resetAll(){
   document.getElementById('status').textContent='Reset to identity.';
   document.getElementById('status').className='status';
   document.getElementById('meta-after').textContent='awaiting transform…';
-  renderEigenPanel(null);drawAll();setTimeout(resizeBrackets,20);
+  renderEigenPanel(null);drawAll();
 }
 
 // ── Vectors ───────────────────────────────────────────────────────────
@@ -936,13 +972,26 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')resetAll();
 });
 
+// ── Theme toggle ──────────────────────────────────────────────────────
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  document.body.classList.toggle('light');
+  drawAll(); // redraw canvases with new colors
+}
+// Init theme from system preference
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+  document.body.classList.add('dark');
+}else{
+  document.body.classList.add('light');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────
 const rbf=initCanvas('before'),raf2=initCanvas('after');
 setupInteraction('before');setupInteraction('after');
 window.addEventListener('resize',()=>{
   rbf();raf2();
   ['before','after'].forEach(id=>{const c=canvases[id];views[id].ox=c.clientWidth/2;views[id].oy=c.clientHeight/2;});
-  drawAll();resizeBrackets();
+  drawAll();
 });
 renderVecs();drawAll();
 </script>
